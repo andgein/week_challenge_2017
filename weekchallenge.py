@@ -116,6 +116,18 @@ class TaskSolver:
     def solve(self, task):
         raise NotImplementedException('Each child should has its own .solve(task)')
 
+    def tests(self):
+        return []
+
+    def run_tests(self):
+        for test_input, correct_answer in self.tests():
+            Logger.info('Test %s.%s with input data "%s"' % (type(self).__module__, type(self).__name__, test_input))
+            answer = self.solve(Task.with_value(test_input))
+            if answer == correct_answer:
+                continue
+            
+            raise AssertionError('Output "%s" is not equal to correct answer "%s"' % (answer, correct_answer))
+
 
 class MegaSolver:
     def __init__(self, token, *solvers):

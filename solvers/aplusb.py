@@ -21,3 +21,11 @@ class Solver(TaskSolver):
         # Производная
         text = re.sub(r'\([^()]+\)\'', '0', text)
         return text
+
+
+    def tests(self):
+        return [
+            ('-5023 - -5260', '237'),
+            ('13!', '6227020800'),
+            ('(10 + 20)\'', '0'),
+        ]

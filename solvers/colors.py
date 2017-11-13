@@ -16,3 +16,10 @@ class Solver(TaskSolver):
         for color, description in self.colors:
             if value in description.lower():
                 return color
+
+
+    def tests(self):
+        return [
+            ('#ff8c00', 'DarkOrange'),
+            ('rgb(250, 235, 215)', 'AntiqueWhite'),
+        ]

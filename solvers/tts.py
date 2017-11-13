@@ -96,3 +96,11 @@ class Solver(TaskSolver):
         for ch in ',.!?:;-!@#$%^&*()':
             text = text.replace(ch, '')
         return text
+
+
+    def tests(self):
+        return [
+            ('/tasks/tts/e2123149-e493-4857-b37a-e37cce3dc45d.mp4', 'Alan'),
+            ('/tasks/tts/66f39cb8-d89e-43dd-a56a-e35919df75b3.mp4', 'Bjarne'),
+            ('/tasks/tts/bfd4c005-9c16-4341-8c72-ed19e3eb8011.mp4', 'Ron'),           
+        ]
