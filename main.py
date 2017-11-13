@@ -191,7 +191,7 @@ class AplusbTask(TaskType):
 
     @staticmethod
     def prepare(text):
-
+        return text
 
 def test_ColorsTask():
     colors = ColorsTask()
