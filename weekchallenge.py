@@ -11,11 +11,11 @@ class _InternalLogger:
         self.logger.setLevel(logging.DEBUG)
 
         stream_handler = logging.StreamHandler()
-        stream_handler.setFormatter(logging.Formatter('[%(levelname)s] %(message)s'))
+        stream_handler.setFormatter(logging.Formatter('{%(thread)d} [%(levelname)s] %(message)s'))
         self.logger.addHandler(stream_handler)
 
         file_handler = logging.FileHandler('weekchallenge.log')
-        file_handler.setFormatter(logging.Formatter('%(asctime)s [%(levelname)s] %(message)s'))
+        file_handler.setFormatter(logging.Formatter('%(asctime)s {%(thread)d} [%(levelname)s] %(message)s'))
         self.logger.addHandler(file_handler)
 
 
