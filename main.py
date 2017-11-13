@@ -5,6 +5,7 @@ import logging
 import sys
 import tempfile
 import json
+import re
 
 
 TOKEN = '745ba685-9cae-43ef-b1e6-2dbaf662b9c6'
@@ -190,7 +191,11 @@ class AplusbTask(TaskType):
         return str(answer)    
 
     @staticmethod
-    def prepare(text):
+    def _prepare(text):
+        # Факториалы
+        text = re.sub(r'(\d+)!', lambda m: '(' + '*'.join(map(str, range(1, int(m.group(1)) + 1))) + ')', text)
+        # Производная
+        text = re.sub(r'\([^()]+\)\'', '0', text)
         return text
 
 def test_ColorsTask():
@@ -219,11 +224,13 @@ def test_TtsTask():
 def test_AplusbTask():
     aplusb = AplusbTask()
     assert(aplusb.solve(Task.with_value('-5023 - -5260')) == '237')
+    assert(aplusb.solve(Task.with_value('13!')) == '6227020800')
+    assert(aplusb.solve(Task.with_value('(10 + 20)\'')) == '0')
 
 if __name__ == '__main__':
     if len(sys.argv) > 1 and sys.argv[1] == 'test':        
         # test_ColorsTask()
-        test_AccentuationTask()
+        # test_AccentuationTask()
         # test_TtsTask()
         test_AplusbTask()
         sys.exit(0)
