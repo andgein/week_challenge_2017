@@ -139,7 +139,7 @@ class MegaSolver:
         self.solvers = solvers
 
     def run(self, ask_after_each_task=True, ignore_unknown=False):
-        Logger.info('Run infinity loop for task solvers')
+        Logger.info('Run infinity loop for task solvers (ask_after_each_task=%s, ignore_unknown=%s)' % (ask_after_each_task, ignore_unknown))
         while True:
             is_correct = self.get_task_and_solve_it(ignore_unknown=ignore_unknown)
             if not is_correct:
@@ -178,7 +178,7 @@ class MegaSolver:
                 break
         else:
             Logger.info('Can\'t find solver for this task type');
-            if not ignore_unknown:
+            if ignore_unknown:
                 Logger.info('OK. Just wait and ignore it')
                 time.sleep(task.deadline_seconds)
             else:
