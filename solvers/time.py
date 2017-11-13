@@ -44,15 +44,28 @@ class Solver(TaskSolver):
         time = splitted[-3]
         city_name = splitted[-2]
 
-        location = self.api.find_city(city_name)
-        offset = self.api.get_timezone_offset(location)
-    
         hours, minutes = self._parse_time(time)
         Logger.info('Current time is %d:%d' % (hours, minutes))
+
+        location = self.api.find_city(city_name)
+        offset = self.api.get_timezone_offset(location)
+
+        minutes_offset = offset // 60
+        hours_offset, minutes_offset = minutes_offset // 60, minutes_offset % 60
+        hours += hours_offset
+        minutes += minutes_offset
+        while hours < 0: hours += 24
+        while hours >= 24: hours -= 24
 
         return '%02d:%02d' % (hours, minutes)
 
 
     def _parse_time(self, time):
-        m = re.findall(r'\d+')
-        return m.groups(1), m.groups(2)
+        m = re.findall(r'\d+', time)
+        return list(map(int, m))
+
+
+    def tests(self):
+        return [
+            ('Время по Гринвичу 02:11 Ченнай ?', '07:41')
+        ]
