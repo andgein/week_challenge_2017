@@ -2,6 +2,7 @@
 import logging
 from urllib.parse import urlencode
 import collections
+import time
 
 
 class _InternalLogger:
@@ -137,10 +138,10 @@ class MegaSolver:
         self.api = Api(token)
         self.solvers = solvers
 
-    def run(self, ask_after_each_task=True):
+    def run(self, ask_after_each_task=True, ignore_unknown=False):
         Logger.info('Run infinity loop for task solvers')
         while True:
-            is_correct = self.get_task_and_solve_it()
+            is_correct = self.get_task_and_solve_it(ignore_unknown=ignore_unknown)
             if not is_correct:
                 Logger.info('Something has gone wrong... Answer is not correct. Stop the process')
                 break
@@ -152,7 +153,7 @@ class MegaSolver:
                     break
         Logger.info('Exiting')
 
-    def get_task_and_solve_it(self):
+    def get_task_and_solve_it(self, ignore_unknown=False):
         task = self.api.get_task()
         Logger.info('Received new task: %s' % str(task))
         task_type = task.type
@@ -176,10 +177,18 @@ class MegaSolver:
 
                 break
         else:
-            Logger.error('Can\'t find solver for this task type');
-            print('Enter correct answer for this task:\n\n%s [%s]' % (task.description, task.value))
-            answer = input().strip()
-            Logger.info('User entered answer "%s"' % answer)
+            Logger.info('Can\'t find solver for this task type');
+            if not ignore_unknown:
+                Logger.info('OK. Just wait and ignore it')
+                time.sleep(task.deadline_seconds)
+            else:
+                print('Enter correct answer for this task:\n\n%s [%s]' % (task.description, task.value))
+                answer = input().strip()
+                Logger.info('User entered answer "%s"' % answer)
 
-        return self.api.submit_answer(task, answer)
+        if answer is not None and len(answer) > 0:
+            return self.api.submit_answer(task, answer)
+    
+        # Проигнорировали таск — как будто бы решили
+        return True
         
