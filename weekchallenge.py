@@ -110,14 +110,14 @@ class Task(collections.namedtuple('Task', ['availability', 'deadline_seconds', '
         return Task(availability='', deadline_seconds=0, description='', format='', id='', scores=0, type='', value=value)
 
 
-class TaskType:
+class TaskSolver:
     type_name = ''
 
     def solve(self, task):
         raise NotImplementedException('Each child should has its own .solve(task)')
 
 
-class Solver:
+class MegaSolver:
     def __init__(self, token, *solvers):
         self.api = Api(token)
         self.solvers = solvers
@@ -143,7 +143,7 @@ class Solver:
         task_type = task.type
         for solver in self.solvers:
             if solver.type_name == task_type:
-                Logger.info('Found solver for this task: %s' % type(solver).__name__)
+                Logger.info('Found solver for this task: %s.%s' % (type(solver).__module__, type(solver).__name__))
 
                 answer = None
                 try:
