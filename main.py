@@ -29,5 +29,12 @@ if __name__ == '__main__':
         print('OK! All tests done')
         sys.exit(0)
     
-    MegaSolver(TOKEN, *solvers).run(ask_after_each_task=False)
+    if len(sys.argv) > 1 and sys.argv[1] == 'silent':
+        silent_mode = True
+        args = dict(ask_after_each_task=False, ignore_unknown=True, ignore_wrong=True, ignore_when_solver_cant_solve=True)
+    else:
+        silent_mode = False
+        args = {}
+
+    MegaSolver(TOKEN, *solvers).run(**args)
                 

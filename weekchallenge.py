@@ -138,11 +138,11 @@ class MegaSolver:
         self.api = Api(token)
         self.solvers = solvers
 
-    def run(self, ask_after_each_task=True, ignore_unknown=False):
+    def run(self, ask_after_each_task=True, ignore_unknown=False, ignore_wrong=False, ignore_when_solver_cant_solve=False):
         Logger.info('Run infinity loop for task solvers (ask_after_each_task=%s, ignore_unknown=%s)' % (ask_after_each_task, ignore_unknown))
         while True:
-            is_correct = self.get_task_and_solve_it(ignore_unknown=ignore_unknown)
-            if not is_correct:
+            is_correct = self.get_task_and_solve_it(ignore_unknown=ignore_unknown, ignore_when_solver_cant_solve=ignore_when_solver_cant_solve)
+            if not is_correct and not ignore_wrong:
                 Logger.info('Something has gone wrong... Answer is not correct. Stop the process')
                 break
 
@@ -153,7 +153,7 @@ class MegaSolver:
                     break
         Logger.info('Exiting')
 
-    def get_task_and_solve_it(self, ignore_unknown=False):
+    def get_task_and_solve_it(self, ignore_unknown=False, ignore_when_solver_cant_solve=False):
         task = self.api.get_task()
         Logger.info('Received new task: %s' % str(task))
         task_type = task.type
@@ -171,16 +171,17 @@ class MegaSolver:
 
                 if answer is None:
                     Logger.error('Answer is None -> Solver can\'t find answer :(')
-                    print('Enter correct answer for this task:\n\n%s [%s]' % (task.description, task.value))
-                    answer = input().strip()
-                    Logger.info('User entered answer "%s"' % answer)
+                    if not ignore_when_solver_cant_solve:
+                        print('Enter correct answer for this task:\n\n%s [%s]' % (task.description, task.value))
+                        answer = input().strip()
+                        Logger.info('User entered answer "%s"' % answer)
 
                 break
         else:
             Logger.info('Can\'t find solver for this task type');
             if ignore_unknown:
-                Logger.info('OK. Just wait and ignore it')
-                time.sleep(task.deadline_seconds)
+                Logger.info('OK. Just ignore it')
+                answer = None
             else:
                 print('Enter correct answer for this task:\n\n%s [%s]' % (task.description, task.value))
                 answer = input().strip()
