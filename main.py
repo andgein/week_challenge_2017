@@ -2,6 +2,7 @@
 from solvers import *
 
 import sys
+import threading
 
 
 TOKEN = '745ba685-9cae-43ef-b1e6-2dbaf662b9c6'
@@ -29,12 +30,19 @@ if __name__ == '__main__':
         print('OK! All tests done')
         sys.exit(0)
     
-    if len(sys.argv) > 1 and sys.argv[1] == 'silent':
+    if '--silent' in sys.argv[1:]:
         silent_mode = True
         args = dict(ask_after_each_task=False, ignore_unknown=True, ignore_wrong=True, ignore_when_solver_cant_solve=True, ignore_internal_errors=True)
     else:
         silent_mode = False
         args = {}
 
-    MegaSolver(TOKEN, *solvers).run(**args)
+    if '--multithread' in sys.argv[1:]:
+        threads = 8
+    else:
+        threads = 1
+
+    mega_solver = MegaSolver(TOKEN, *solvers)
+    for _ in range(threads):
+        threading.Thread(target = mega_solver.run, kwargs=args).start()
                 
