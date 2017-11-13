@@ -16,7 +16,7 @@ class GoogleGeoApi:
 
     def find_city(self, city_name):
         Logger.info('Looking for coordinates for "%s"' % city_name)
-        url = '/maps/api/geocode/json?%s' % urlencode({'address': city_name})
+        url = '/maps/api/geocode/json?%s' % urlencode({'address': city_name, 'key': GOOGLE_API_KEY})
         r = self.client.get_or_die(url)
         location = r['results'][0]['geometry']['location']
         lat = location['lat']
