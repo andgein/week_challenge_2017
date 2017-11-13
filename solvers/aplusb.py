@@ -16,6 +16,10 @@ class Solver(TaskSolver):
 
     @staticmethod
     def _prepare(text):
+        # Степень
+        text = text.replace('^', '**')
+        # Двойные факториалы
+        text = re.sub(r'(\d+)!!', lambda m: '(' + '*'.join(map(str, range(1, int(m.group(1)) + 1, 2))) + ')', text)
         # Факториалы
         text = re.sub(r'(\d+)!', lambda m: '(' + '*'.join(map(str, range(1, int(m.group(1)) + 1))) + ')', text)
         # Производная
@@ -28,4 +32,6 @@ class Solver(TaskSolver):
             ('-5023 - -5260', '237'),
             ('13!', '6227020800'),
             ('(10 + 20)\'', '0'),
+            ('10^2', '100'),
+            ('3!!', '3'),
         ]
