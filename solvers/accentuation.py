@@ -6,12 +6,25 @@ class Solver(TaskSolver):
 
     base_url = 'http://accentonline.ru'
 
+    exceptions = {
+        'незадолго': 'незадОлго', # наша база почему-то предлагает двойную норму
+    }
+
     def __init__(self):
         self.client = JsonClient(self.base_url)
 
     def solve(self, task):
         # Иногда прилетают английские буквы в русских словах, это всё портит. Например, «окружит», у которой первая О — английская
         value = self._replace_english_to_russian(task.value.lower())
+
+        # Исключения
+        if value in self.exceptions:
+            return self.exceptions[value]
+
+        # Буква Ё
+        if 'ё' in value:
+            return value.replace('ё', 'Ё')
+
         url = '/accents.json?q=' + value
 
         response = self.client.get_or_die(url)
@@ -64,5 +77,7 @@ class Solver(TaskSolver):
             ('арбуз', 'арбУз'),
             ('мама', 'мАма'),
             ('вечеря', 'вЕчеря'),
-            ('oкружит', 'oкружИт'),            
+            ('oкружит', 'oкружИт'),
+            ('заселён', 'заселЁн'),
+            ('незадолго', 'незадОлго'),
         ]

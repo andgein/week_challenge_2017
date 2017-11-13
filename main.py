@@ -25,6 +25,8 @@ if __name__ == '__main__':
             if module_name is not None and type(solver).__module__ != 'solvers.' + module_name:
                 continue            
             solver.run_tests()
+
+        print('OK! All tests done')
         sys.exit(0)
     
     MegaSolver(TOKEN, *solvers).run(ask_after_each_task=False)
