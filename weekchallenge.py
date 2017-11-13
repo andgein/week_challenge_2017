@@ -1,0 +1,170 @@
+﻿import requests
+import logging
+from urllib.parse import urlencode
+import collections
+
+
+class _InternalLogger:
+    def __init__(self):
+        self.logger = logging.getLogger('WeekChallenge')
+        self.logger.setLevel(logging.DEBUG)
+
+        stream_handler = logging.StreamHandler()
+        stream_handler.setFormatter(logging.Formatter('[%(levelname)s] %(message)s'))
+        self.logger.addHandler(stream_handler)
+
+        file_handler = logging.FileHandler('weekchallenge.log')
+        file_handler.setFormatter(logging.Formatter('%(asctime)s [%(levelname)s] %(message)s'))
+        self.logger.addHandler(file_handler)
+
+
+class Logger:
+    instance = _InternalLogger()
+
+    @classmethod
+    def info(cls, message):  
+        cls.instance.logger.info(message)
+
+    @classmethod
+    def warn(cls, message):  
+        cls.instance.logger.warn(message)
+
+    @classmethod
+    def error(cls, message):  
+        cls.instance.logger.error(message)
+
+    @classmethod
+    def debug(cls, message):  
+        cls.instance.logger.debug(message)
+
+
+class JsonClient:
+    def __init__(self, base_url=''):
+        self.base_url = base_url
+
+    def get_or_die(self, url):
+        return self._make_request_or_die(url, lambda url: requests.get(url))
+
+    def post_or_die(self, url, data=None):
+        if data is None:
+            data = {}
+        return self._make_request_or_die(url, lambda url: requests.post(url, data=data))
+    
+    def _make_request_or_die(self, url, request_function, tries=3):
+        for try_index in range(tries):
+            try:
+                return self._try_make_request_or_die(url, request_function)
+            except Exception as e:
+                Logger.debug('Exception: %s. Let\'s try one more time (%d/%d)' % (e, try_index, tries))
+
+    def _try_make_request_or_die(self, url, request_function):
+        url = self.base_url + url
+        Logger.debug('Send request to %s' % url)
+        r = request_function(url)
+        if not r.ok:
+            Logger.warn('HTTP status code is %d' % (r.status_code))
+            raise Exception('Can\'t get response from %s' % url);
+
+        Logger.debug('HTTP status code is %d, response: "%s"' % (r.status_code, r.text))
+        return r.json()
+    
+
+class Api:
+    base_url = 'http://wc.kontur.cloud'
+
+    def __init__(self, token):
+        self.token = token
+        self.client = JsonClient(self.base_url)
+
+    def get_task(self):
+        task = self.client.get_or_die('/tasks?token=%s' % self.token)
+        return Task(**task)
+
+    def submit_answer(self, task, answer):
+        """
+            task = api.get_task()
+            is_correct = api.submit_answer(task, 'Your answer')
+            ** OR **
+            is_correct = api.submit_answer(task.id, 'Your answer')
+        """
+        if type(task) is str:
+            task_id = task
+        else:
+            # task can be Task.id or Task itself
+            task_id = task.id
+        Logger.info('Try to submit answer "%s" for task %s' % (answer, task_id))
+        is_correct = self.client.post_or_die('/tasks?%s' % urlencode({'token': self.token, 'task': task_id, 'answer': answer}))
+        Logger.debug('Received response for answer submitting: %s' % is_correct) 
+
+        if is_correct:
+            Logger.info('Yahoo, it\'s correct!')
+        else:
+            Logger.info('No, it\'s wrong :-(')
+        
+        return is_correct
+
+        
+class Task(collections.namedtuple('Task', ['availability', 'deadline_seconds', 'description', 'format', 'id', 'scores', 'type', 'value'])):
+    @staticmethod
+    def with_value(value):
+        return Task(availability='', deadline_seconds=0, description='', format='', id='', scores=0, type='', value=value)
+
+
+class TaskType:
+    type_name = ''
+
+    def solve(self, task):
+        raise NotImplementedException('Each child should has its own .solve(task)')
+
+
+class Solver:
+    def __init__(self, token, *solvers):
+        self.api = Api(token)
+        self.solvers = solvers
+
+    def run(self, ask_after_each_task=True):
+        Logger.info('Run infinity loop for task solvers')
+        while True:
+            is_correct = self.get_task_and_solve_it()
+            if not is_correct:
+                Logger.info('Something has gone wrong... Answer is not correct. Stop the process')
+                break
+
+            if ask_after_each_task:
+                print('\n\nContinue? [Y/N]')
+                yesno = input().strip().lower()
+                if 'y' != yesno:
+                    break
+        Logger.info('Exiting')
+
+    def get_task_and_solve_it(self):
+        task = self.api.get_task()
+        Logger.info('Received new task: %s' % str(task))
+        task_type = task.type
+        for solver in self.solvers:
+            if solver.type_name == task_type:
+                Logger.info('Found solver for this task: %s' % type(solver).__name__)
+
+                answer = None
+                try:
+                    answer = solver.solve(task)
+                except Exception as e:
+                    Logger.error('Solver raised the exception: %s' % e)
+                else:
+                    Logger.info('Solver returned answer: %s' % answer)
+
+                if answer is None:
+                    Logger.error('Answer is None -> Solver can\'t find answer :(')
+                    print('Enter correct answer for this task:\n\n%s [%s]' % (task.description, task.value))
+                    answer = input().strip()
+                    Logger.info('User entered answer "%s"' % answer)
+
+                break
+        else:
+            Logger.error('Can\'t find solver for this task type');
+            print('Enter correct answer for this task:\n\n%s [%s]' % (task.description, task.value))
+            answer = input().strip()
+            Logger.info('User entered answer "%s"' % answer)
+
+        return self.api.submit_answer(task, answer)
+        
