@@ -31,7 +31,7 @@ if __name__ == '__main__':
     
     if len(sys.argv) > 1 and sys.argv[1] == 'silent':
         silent_mode = True
-        args = dict(ask_after_each_task=False, ignore_unknown=True, ignore_wrong=True, ignore_when_solver_cant_solve=True)
+        args = dict(ask_after_each_task=False, ignore_unknown=True, ignore_wrong=True, ignore_when_solver_cant_solve=True, ignore_internal_errors=True)
     else:
         silent_mode = False
         args = {}

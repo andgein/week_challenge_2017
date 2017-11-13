@@ -138,10 +138,18 @@ class MegaSolver:
         self.api = Api(token)
         self.solvers = solvers
 
-    def run(self, ask_after_each_task=True, ignore_unknown=False, ignore_wrong=False, ignore_when_solver_cant_solve=False):
+    def run(self, ask_after_each_task=True, ignore_unknown=False, ignore_wrong=False, ignore_when_solver_cant_solve=False, ignore_internal_errors=False):
         Logger.info('Run infinity loop for task solvers (ask_after_each_task=%s, ignore_unknown=%s)' % (ask_after_each_task, ignore_unknown))
         while True:
-            is_correct = self.get_task_and_solve_it(ignore_unknown=ignore_unknown, ignore_when_solver_cant_solve=ignore_when_solver_cant_solve)
+            try:
+                is_correct = self.get_task_and_solve_it(ignore_unknown=ignore_unknown, ignore_when_solver_cant_solve=ignore_when_solver_cant_solve)
+            except Exception as e:
+                if not ignore_internal_errors:
+                    raise
+                Logger.error('Ignore exception, sleep 1 second and retry: %s' % e)
+                time.sleep(1)
+                continue
+
             if not is_correct and not ignore_wrong:
                 Logger.info('Something has gone wrong... Answer is not correct. Stop the process')
                 break
