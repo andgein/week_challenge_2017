@@ -56,6 +56,9 @@ class JsonClient:
                 return self._try_make_request_or_die(url, request_function)
             except Exception as e:
                 Logger.debug('Exception: %s. Let\'s try one more time (%d/%d)' % (e, try_index, tries))
+                last_exception = e
+        raise last_exception
+        
 
     def _try_make_request_or_die(self, url, request_function):
         url = self.base_url + url
