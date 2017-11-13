@@ -56,7 +56,7 @@ class JsonClient:
             try:
                 return self._try_make_request_or_die(url, request_function)
             except Exception as e:
-                Logger.debug('Exception: %s. Let\'s try one more time (%d/%d)' % (e, try_index, tries))
+                Logger.debug('Exception: %s. Let\'s try one more time (%d/%d)' % (e, try_index + 1, tries))
                 last_exception = e
         raise last_exception
         
