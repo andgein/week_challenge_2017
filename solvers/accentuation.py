@@ -42,7 +42,7 @@ class Solver(TaskSolver):
     def _replace_english_to_russian(text):
         text = text.replace('a', 'а')
         text = text.replace('c', 'с')
-        text = text.replace('e', 'у')
+        text = text.replace('e', 'е')
         text = text.replace('o', 'о')
         text = text.replace('y', 'у')
         text = text.replace('p', 'р')
@@ -56,3 +56,13 @@ class Solver(TaskSolver):
         # Если нашли ещё ударение — удаляем
         return result
 
+    def tests(self):
+        return [
+            ('корова', 'корОва'),
+            ('ягода', 'Ягода'),
+            ('ежевика', 'ежевИка'),
+            ('арбуз', 'арбУз'),
+            ('мама', 'мАма'),
+            ('вечеря', 'вЕчеря'),
+            ('oкружит', 'oкружИт'),            
+        ]
