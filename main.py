@@ -1,5 +1,6 @@
-﻿from weekchallenge import *
-from solvers import *
+﻿from time import sleep
+
+from weekchallenge import *
 
 import sys
 import threading
@@ -7,25 +8,16 @@ import threading
 
 TOKEN = '745ba685-9cae-43ef-b1e6-2dbaf662b9c6'
 
+SOLVERS = get_solvers()
 
 if __name__ == '__main__':
-    # Добавлять новые солверы сюда
-    solvers = [
-        colors.Solver(),
-        accentuation.Solver(),
-        tts.Solver(),
-        aplusb.Solver(),
-        time.Solver(),
-        s_like_dollar.Solver()
-    ]
-
     # Запускаем тесты
     if len(sys.argv) > 1 and sys.argv[1] == '--test':
         module_name = None
         if len(sys.argv) > 2:
             module_name = sys.argv[2]
 
-        for solver in solvers:
+        for solver in SOLVERS:
             if module_name is not None and type(solver).__module__ != 'solvers.' + module_name:
                 continue                    
             solver.run_tests()
@@ -43,12 +35,14 @@ if __name__ == '__main__':
 
     # Многопоточный режим. Шарашит в 8 потоков
     if '--multithread' in sys.argv[1:]:
-        threads = 8
+        threads = 4
     else:
         threads = 1
 
     # Запускаем мега-солвер!
-    mega_solver = MegaSolver(TOKEN, *solvers)
+    mega_solver = MegaSolver(TOKEN, *SOLVERS)
+
     for _ in range(threads):
         threading.Thread(target = mega_solver.run, kwargs=args).start()
+        sleep(1)
                 

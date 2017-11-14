@@ -3,10 +3,33 @@ import logging
 from urllib.parse import urlencode
 import collections
 import time
+import threading
+import os
+import os.path
+
+
+def get_solvers():
+    import solvers.colors
+    import solvers.accentuation
+    import solvers.tts
+    import solvers.aplusb
+    import solvers.i_like_time
+    import solvers.s_like_dollar
+    import solvers.poems
+
+    return [
+        solvers.colors.Solver(),
+        solvers.accentuation.Solver(),
+        solvers.tts.Solver(),
+        solvers.aplusb.Solver(),
+        solvers.i_like_time.Solver(),
+        solvers.s_like_dollar.Solver(),
+        solvers.poems.Solver(),
+    ]
 
 
 class _InternalLogger:
-    def __init__(self):
+    def __init__(self, filename):
         self.logger = logging.getLogger('WeekChallenge')
         self.logger.setLevel(logging.DEBUG)
 
@@ -14,29 +37,60 @@ class _InternalLogger:
         stream_handler.setFormatter(logging.Formatter('{%(thread)d} [%(levelname)s] %(message)s'))
         self.logger.addHandler(stream_handler)
 
-        file_handler = logging.FileHandler('weekchallenge.log')
+        file_handler = logging.FileHandler(filename)
         file_handler.setFormatter(logging.Formatter('%(asctime)s {%(thread)d} [%(levelname)s] %(message)s'))
         self.logger.addHandler(file_handler)
 
 
 class Logger:
-    instance = _InternalLogger()
+    instance = None
+
+    @classmethod
+    def init(cls, filename='weekchallenge.log'):
+        """ Если надо переинициализировать логгер """
+        cls.instance = _InternalLogger(filename)
+        cls.enabled = True
+
+    @classmethod
+    def setup(cls, filename):
+        cls.init(filename)
+
+    @classmethod
+    def init_if_needed(cls):
+        if cls.instance is None:
+            cls.init()
+
+    @classmethod
+    def disable(cls):
+        cls.enabled = False
+
+    @classmethod
+    def enable(cls):
+        cls.enabled = True
 
     @classmethod
     def info(cls, message):  
-        cls.instance.logger.info(message)
+        cls.init_if_needed()
+        if cls.enabled:
+            cls.instance.logger.info(message)
 
     @classmethod
     def warn(cls, message):  
-        cls.instance.logger.warn(message)
+        cls.init_if_needed()
+        if cls.enabled:
+            cls.instance.logger.warn(message)
 
     @classmethod
-    def error(cls, message):  
-        cls.instance.logger.error(message)
+    def error(cls, message):
+        cls.init_if_needed()      
+        if cls.enabled:
+            cls.instance.logger.error(message)
 
     @classmethod
-    def debug(cls, message):  
-        cls.instance.logger.debug(message)
+    def debug(cls, message):
+        cls.init_if_needed()      
+        if cls.enabled:
+            cls.instance.logger.debug(message)
 
 
 class JsonClient:

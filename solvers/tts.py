@@ -65,7 +65,6 @@ class Solver(TaskSolver):
 
         author = quote[':a'].split()
         name = author[0]
-        print(name)
         return name
 
     def _find_suitable_quote(self, text):
