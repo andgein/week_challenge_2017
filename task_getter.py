@@ -8,7 +8,7 @@ import json
 from weekchallenge import *
 
 TOKEN = '745ba685-9cae-43ef-b1e6-2dbaf662b9c6'
-SLEEP_INTERVAL = 0.15 # in seconds
+SLEEP_INTERVAL = 0.08 # in seconds
 TASKS_DIRECTORY = 'tasks'
 
 

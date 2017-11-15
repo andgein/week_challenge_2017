@@ -19,9 +19,10 @@ class Solver(TaskSolver):
             return value.replace('ё', 'Ё')
 
         for word in self.collection:
-            if value in word.lower():
+            if value == word.lower():
                 Logger.debug('Found similar word "%s"' % word)
-                return self.set_accentuation(task.value, word)
+                with_accentuation = self.set_accentuation(task.value, word)
+                return with_accentuation.split()[0]
 
         return None
 

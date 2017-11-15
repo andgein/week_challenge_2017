@@ -18,6 +18,9 @@ class Solver(TaskSolver):
     def _prepare(text):
         if text == '0!':
             text = '1'
+
+        text = re.sub(r'-(\d+)', r'(-\1)', text)
+
         # Степень
         text = text.replace('^', '**')
         # Двойные факториалы
@@ -25,7 +28,7 @@ class Solver(TaskSolver):
         # Факториалы
         text = re.sub(r'(\d+)!', lambda m: '(' + '*'.join(map(str, range(1, int(m.group(1)) + 1))) + ')', text)
         # Производная
-        text = re.sub(r'\([^()]+\)\'', '0', text)
+        text = re.sub(r'^\(.+\)\'$', '0', text)
         return text
 
 
@@ -34,6 +37,8 @@ class Solver(TaskSolver):
             ('-5023 - -5260', '237'),
             ('13!', '6227020800'),
             ('(10 + 20)\'', '0'),
+            ('(-10 + -20)\'', '0'),
             ('10^2', '100'),
             ('3!!', '3'),
+            ('-34^0', '1'),
         ]

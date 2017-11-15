@@ -101,20 +101,15 @@ def try_send_stats(to_stdout=False):
             temp_stats[task] = {'s':0, 'f':0}
 
 
-    message = '*СТАТИСТИКА ПО ТАСКАМ* за последние 10 минут\n'
-    if to_stdout:
-        print(message)
-    else:
-        TelegramChat.send_message(message)
-
     for t in stats:
-        task_info = '*{}*\nУспех: {} (всего {})\nПровал: {} (всего {})\n'.format(t, temp_stats[t]['s'], stats[t]['s'], temp_stats[t]['f'], stats[t]['f'], failed_tasks)
+        task_info = 'Статистика по таску *%s* за последние %d минут\n\n' % (t, STATS_SPAM_INTERVAL // 60)
+        task_info += '*Успех: {} (всего {})*\n*Провал: {} (всего {})*\n'.format(temp_stats[t]['s'], stats[t]['s'], temp_stats[t]['f'], stats[t]['f'])
 
         failed_tasks_of_this_type = failed_tasks[t][:10]
         if len(failed_tasks_of_this_type) > 0:
             task_info: 'Примеры фейлов:\n'
         for task, answer in failed_tasks_of_this_type:
-            task_info += '\t`%s`: "%s". Мы ответили "%s", получили %d очков\n' % (task.id, prepare_markdown(task.value.replace('\n', r'\n')), prepare_markdown(answer), task.scores['incorrect_answer'])
+            task_info += '\t`%s`: «%s». Мы ответили «%s», получили %d очков\n' % (task.id, prepare_markdown(task.value.replace('\n', r'\n')), prepare_markdown(answer), task.scores['incorrect_answer'])
 
         if to_stdout:
             print(task_info)
