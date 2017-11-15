@@ -134,7 +134,7 @@ class JsonClient:
             Logger.warn('HTTP status code is %d' % (r.status_code))
             # Костыль для отправки старых ответов
             if r.status_code == 400:
-                return False    
+                return None    
             raise Exception('Can\'t get response from %s' % url);
 
         Logger.debug('HTTP status code is %d, response: "%s"' % (r.status_code, r.text))
@@ -176,7 +176,7 @@ class Api:
 
         if is_correct:
             Logger.info('Yahoo, it\'s correct!')
-        else:
+        elif is_correct is not None:
             Logger.info('No, it\'s wrong :-(')
         
         return is_correct

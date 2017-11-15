@@ -13,7 +13,7 @@ import collections
 from weekchallenge import *
 
 TOKEN = '745ba685-9cae-43ef-b1e6-2dbaf662b9c6'
-SLEEP_INTERVAL = 0.1 # in seconds
+SLEEP_INTERVAL = 0 # in seconds
 TASKS_DIRECTORY = 'tasks'
 
 STATS_SPAM_INTERVAL = 10 * 60 # in seconds

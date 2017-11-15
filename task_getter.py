@@ -4,6 +4,7 @@ import os.path
 import tempfile
 import shutil
 import json
+import sys
 
 from weekchallenge import *
 
@@ -41,7 +42,7 @@ def main():
 
             if STOP_ON_UNKNOWN_TASKS and not is_task_known(task):
                 Logger.warn('Received unknown task: %s' % str(task))
-                TelegramChat.send_message('*ALARM*\n\nПодъехал новый вид заданий: ```%s```Я пока остановил всех демонов до вашего прихода. Вперёд!\n_И да пребудет с вами сила._')
+                TelegramChat.send_message('*ALARM*\n\nПодъехал новый вид заданий: ```%s```Я пока остановил всех демонов до вашего прихода. Вперёд!\n_И да пребудет с вами сила._' % task.type)
                 sys.exit(1)
 
         except Exception as e:

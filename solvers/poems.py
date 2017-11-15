@@ -24,11 +24,19 @@ class Solver(TaskSolver):
         pass
 
     def heavy_init(self):
-        files = glob.glob('files/poems/*') + glob.glob('files/libverse.ru/*/*.html')
         self.collection = []
+
+        with open('files/libverse.ru.txt', encoding='utf-8') as f:
+            self.collection.append(f.read())
+
+        files = glob.glob('files/poems/*')
         for filename in files:
             with open(filename, encoding='utf-8') as f:
-                self.collection.append(f.read())
+                try:
+                    self.collection.append(f.read())
+                except:
+                    pass
+
 
     def solve(self, task):
         value = task.value
@@ -38,10 +46,10 @@ class Solver(TaskSolver):
             return self.exceptions[value]
 
         lines = value.split('\n')
-        if '_' in lines[0]:
-            search_line = lines[1]
+        if '_' in lines[1]:
+            search_line = lines[2]
         else:
-            search_line = lines[0]
+            search_line = lines[1]
         for line in lines:
             if '_' in line:
                 need_line = line

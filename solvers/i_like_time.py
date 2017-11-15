@@ -41,6 +41,12 @@ class Solver(TaskSolver):
 
     exceptions = {
         'Кобан': -6,
+        'Флорес': -6,
+        'Ад': -5,
+        'Сайда': +2,
+        'Сур': +4,
+        'Мило': -5,
+        'Сантьяго': -4,
 
     }
 
@@ -68,6 +74,14 @@ class Solver(TaskSolver):
         hours_offset, minutes_offset = minutes_offset // 60, minutes_offset % 60
         hours += hours_offset
         minutes += minutes_offset
+
+        while minutes >= 60:
+            hours += 1
+            minutes -= 60
+        while minutes < 0:
+            hours -= 1
+            minutes += 60
+
         while hours < 0: hours += 24
         while hours >= 24: hours -= 24
 
