@@ -15,6 +15,12 @@ TOKEN = '745ba685-9cae-43ef-b1e6-2dbaf662b9c6'
 SLEEP_INTERVAL = 0.1 # in seconds
 TASKS_DIRECTORY = 'tasks'
 
+STATS_SPAM_INTERVAL = 10 * 60 # in seconds
+
+stats = {}
+temp_stats = {}
+stats_sent_at = time.time()
+
 
 def main():
     api = Api(TOKEN)
@@ -50,7 +56,43 @@ def find_answer_and_submit_it(api):
     is_correct = api.submit_answer(task_id, answer, gracefully=True)
     os.remove(filename)
 
+    if task_type not in temp_stats:
+        temp_stats[task_type] = {'s':0, 'f':0}
+
+    temp_stats[task_type]['s' if is_correct else 'f'] += 1
+    
+    global stats_sent_at
+    if time.time() - stats_sent_at > STATS_SPAM_INTERVAL:
+        stats_sent_at = time.time()
+        Logger.info('sending stats to bot...')
+        try_send_stats()
+
+def try_send_stats():
+    global temp_stats
+
+    for task in temp_stats:
+        if task not in stats:
+            stats[task] = temp_stats[task]
+            continue
+        stats[task]['s'] += temp_stats[task]['s']
+        stats[task]['f'] += temp_stats[task]['f']
+
+    for task in stats:
+        if task not in temp_stats:
+            temp_stats[task] = {'s':0, 'f':0}
+
+    task_infos = ('Таск: *{}* Успех: {}`(+{})`\tПровал: {}`(+{})`'
+        .format(t, stats[t]['s'], temp_stats[t]['s'], stats[t]['f'], temp_stats[t]['f']) for t in stats)
+    msg = '\n'.join(task_infos)
+
+    temp_stats.clear()
+
+    try:
+        TelegramChat.send_message(msg)
+    except Exception as e:
+        Logger.error('send stats crashed. ' + e.message)
+
 
 if __name__ == '__main__':
     Logger.setup(filename='logs/answer_submitter.log')
-    main()                
+    main()
