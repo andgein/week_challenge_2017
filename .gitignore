@@ -4,6 +4,8 @@ __pycache__/
 *$py.class
 
 files/poems/
+files/libverse.ru/
+tasks/
 
 # C extensions
 *.so
