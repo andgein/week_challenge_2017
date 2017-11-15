@@ -51,7 +51,7 @@ def main():
 
 
 def is_task_known(task):
-    for solver in solvers:
+    for solver in SOLVERS:
         if solver.type_name == task.type:
             return True
 
