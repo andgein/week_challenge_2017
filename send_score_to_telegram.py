@@ -3,6 +3,7 @@
 import requests
 from bs4 import BeautifulSoup
 import time
+import sys
 
 
 SEND_SCORE_EACH = 10 * 60 # seconds
@@ -12,14 +13,14 @@ TEAM_NAME = 'Фантастическая четвёрка'
 
 last_scores = {}
 
-def main():
+def main(to_stdout=False):
     last_sent_time = 0    
 
     while not stopped():
         current_time = int(time.time())
         if current_time - last_sent_time > SEND_SCORE_EACH:
             try:
-                get_and_send_score()
+                get_and_send_score(to_stdout=to_stdout)
             except Exception as e:
                 Logger.error('Exception: %s' % e)
             last_sent_time = current_time
@@ -27,25 +28,23 @@ def main():
     Logger.info('Exiting')
 
 
-def get_and_send_score():
+def get_and_send_score(to_stdout=False):
     global last_scores
 
     scores = list(get_scores())
 
-    message = 'Текущие результаты:\n'
+    message = '*Текущие результаты*\n'
     if len(last_scores) == 0:
-        message += '_(я только запустился. Буду присылать изменения в результатах каждые %d минут)_\n' % (SEND_SCORE_EACH // 60)
+        message += '_Я только запустился. Буду присылать изменения в результатах каждые %d минут_\n' % (SEND_SCORE_EACH // 60)
     message += '\n'
 
     position = 1
     for team_name, score in scores:
         team_name = team_name.replace('*', r'\*').replace('_', r'\_')
-        if TEAM_NAME in team_name:
-            team_name = '*%s*' % team_name
 
         score_int = int(score.replace(' ', ''))
 
-        message += '%02d. %s: %s' % (position, team_name, score)
+        team_message = '%02d. %s: %s' % (position, team_name, score)
         if team_name in last_scores:
             diff = score_int - last_scores[team_name]
             if diff >= 0:
@@ -53,13 +52,20 @@ def get_and_send_score():
             else:
                 diff_str = str(diff)
 
-            message += ' (%s)' % diff_str
-        message += '\n'
+            team_message += ' (%s)' % diff_str
+
+        if TEAM_NAME in team_name:
+            team_message = '*%s*' % team_message
+
+        message += team_message + '\n'
 
         position += 1
         last_scores[team_name] = score_int
 
-    TelegramChat.send_message(message)
+    if to_stdout:
+        print(message)
+    else:
+        TelegramChat.send_message(message)
 
 
 def get_scores():
@@ -80,4 +86,4 @@ def get_scores():
         yield (team_name, score)
 
 if __name__ == '__main__':
-    main()
+    main('--stdout' in sys.argv[1:])
