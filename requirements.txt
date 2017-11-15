@@ -2,3 +2,4 @@
 SpeechRecognition
 ffmpy
 python-telegram-bot
+gmpy2

@@ -23,6 +23,8 @@ def get_solvers():
     import solvers.s_like_dollar
     import solvers.poems
     import solvers.tsya
+    import solvers.tsya_strikes_back
+    import solvers.bruce_schneier
 
     return [
         solvers.colors.Solver(),
@@ -33,6 +35,8 @@ def get_solvers():
         solvers.s_like_dollar.Solver(),
         solvers.poems.Solver(),
         solvers.tsya.Solver(),
+        solvers.tsya_strikes_back.Solver(),
+        solvers.bruce_schneier.Solver(),
     ]
 
 
