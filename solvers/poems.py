@@ -12,7 +12,9 @@ class Solver(TaskSolver):
     exceptions = {
         'Ты говоришь, что счастья нет,\nИль скудно Бог его отмерил,\nНо только, если бы был ____,\nТогда бы я тебе поверил!': 'слеп',
         'Входите все. Во внутренних покоях\nЗавета нет, ____ тайна здесь лежит.\nСтаринных книг на древних аналоях\nСмущает вас оцепеневший вид.': 'хоть',
-        'Где яблоня над нами вся в цвету\nДушистые клонила опахала,\nИ где земля, как ты, благоухала,\nИ бабочки любились ______...': 'на лету'
+        'Где яблоня над нами вся в цвету\nДушистые клонила опахала,\nИ где земля, как ты, благоухала,\nИ бабочки любились ______...': 'на лету',
+        'Над пустынями водными\nВиден пенный узор.\nИ слезами холодными\n___________ взор.': 'затуманился',
+        'К молодым ты не тянися!\nВот костыль и вот ________,\nУспокоиться сумей-ка!\nСвой пример я предлагаю:': 'скамейка',
     }
 
     def __init__(self):
@@ -50,7 +52,9 @@ class Solver(TaskSolver):
         for text in self.collection:
             if search_line in text:
                 Logger.info('Found search_line in text from collection')
-                return self.find_substitution(text, need_line).lower()
+                position = text.index(search_line)
+                subtext = text[max(0, position-2000):min(len(text), position+2000)]
+                return self.find_substitution(subtext, need_line).lower()
 
         return None
         

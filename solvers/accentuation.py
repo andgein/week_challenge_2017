@@ -11,6 +11,10 @@ class Solver(TaskSolver):
                 self.collection.append(line.strip())
 
     def solve(self, task):
+        # WTF, непонятно, как себя вести с английское е
+        if task.value.lower() == 'пeтля':
+            return 'пEтля'
+
         # Иногда прилетают английские буквы в русских словах, это всё портит. Например, «окружит», у которой первая О — английская
         value = self._replace_english_to_russian(task.value.lower())
 
@@ -29,7 +33,7 @@ class Solver(TaskSolver):
     def set_accentuation(self, original, result):
         for i, ch in enumerate(result):
             if ch.isupper():
-                return original[:i] + original[i].upper() + original[i + 1:]
+                return original[:i] + ch.upper() + original[i + 1:]
 
         return result
                     

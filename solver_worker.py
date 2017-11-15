@@ -32,7 +32,7 @@ def main(task_type):
 
     rename_old_files(solver)
 
-    while not stopped():
+    while not stopped() and not stopped_solvers():
         try:
             find_task_and_solve_it(solver)
         except Exception as e:
@@ -90,6 +90,9 @@ def find_task(folder):
     task = Task(**d)
 
     return (filename, task)
+
+def stopped_solvers():
+    return os.path.exists('stop.solvers.txt')
 
 if __name__ == '__main__':
     if len(sys.argv) == 1:

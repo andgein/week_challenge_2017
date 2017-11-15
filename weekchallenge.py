@@ -169,7 +169,7 @@ class Api:
             is_correct = self.client.post_or_die('/tasks?%s' % urlencode({'token': self.token, 'task': task_id, 'answer': answer}), tries=15)
         except:
             if gracefully:
-                return False
+                return None
             else:
                 raise
         Logger.debug('Received response for answer submitting: %s' % is_correct) 

@@ -327,7 +327,7 @@
 	},
 	{
 		":c": "Any sufficiently advanced technology is indistinguishable from magic.",
-		":a": "Sir Arthur C Clarke"
+		":a": "Arthur C Clarke"
 	},
 	{
 		":c": "You start writing code, I'll go see what the customer wants"
@@ -507,7 +507,7 @@
 	},
 	{
 		":c": "In C, its easy to shoot yourself in the foot. C++ makes it more difficult, but when you do, you'll blow your whole leg off.",
-		":a": "Stroustrup"
+		":a": "Bjarne Stroustrup"
 	},
 	{
 		":c": "Multi-threading is the art of screwing things up before, during or after something else."

@@ -65,7 +65,10 @@ def find_answer_and_submit_it(api, to_stdout=False):
         task = Task(**json.loads(f.read()))
     os.remove(solving_filename)
 
-    update_statistics(is_correct, task_type, task_id, task, answer, to_stdout=to_stdout)
+    if is_correct is not None:
+        update_statistics(is_correct, task_type, task_id, task, answer, to_stdout=to_stdout)
+    else:
+        Logger.warn('is_correct = None, don\'t update statistics')
     
 
 def update_statistics(is_correct, task_type, task_id, task, answer, to_stdout=False):

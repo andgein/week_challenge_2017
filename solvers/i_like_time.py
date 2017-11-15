@@ -28,13 +28,21 @@ class GoogleGeoApi:
         Logger.info('Getting timezone for location: %s' % location)
         url = '/maps/api/timezone/json?%s' % urlencode({'location': location, 'timestamp': int(time.time()), 'key': GOOGLE_API_KEY})
         r = self.client.get_or_die(url)
-        offset = r['dstOffset'] + r['rawOffset']
+
+        # offset = r['dstOffset'] + r['rawOffset']
+        offset = r['rawOffset']
+
         Logger.info('Summary offset is %d' % offset)
         return offset
 
 
 class Solver(TaskSolver):
     type_name = 'I-love-time'
+
+    exceptions = {
+        'Кобан': -6,
+
+    }
 
     def __init__(self):
         self.api = GoogleGeoApi()
@@ -52,6 +60,9 @@ class Solver(TaskSolver):
 
         location = self.api.find_city(city_name)
         offset = self.api.get_timezone_offset(location)
+
+        if city_name in self.exceptions:
+            offset = self.exceptions[city_name] * 60
 
         minutes_offset = offset // 60
         hours_offset, minutes_offset = minutes_offset // 60, minutes_offset % 60
