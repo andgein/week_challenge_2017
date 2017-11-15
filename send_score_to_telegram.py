@@ -34,8 +34,7 @@ def get_and_send_score(to_stdout=False):
     scores = list(get_scores())
 
     message = '*ТЕКУЩИЕ РЕЗУЛЬТАТЫ*\n'
-    if len(last_scores) == 0:
-        message += '_Я только запустился. Буду присылать изменения в результатах каждые %d минут_\n' % (SEND_SCORE_EACH // 60)
+    first_time = len(last_scores) == 0
     message += '\n'
 
     position = 1
@@ -65,7 +64,8 @@ def get_and_send_score(to_stdout=False):
     if to_stdout:
         print(message)
     else:
-        TelegramChat.send_message(message)
+        if not first_time:
+            TelegramChat.send_message(message)
 
 
 def get_scores():

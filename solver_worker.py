@@ -67,6 +67,7 @@ def find_task_and_solve_it(solver):
     else:
         # TelegramChat.send_message('Солвер %s не смог решить задание "%s" (%s) и честно признался в этом 🤷🏼‍♀️' % (task.type, task.value, task.id))
         Logger.warn('Solver can\'t solve task %s, it returned None' % task.id)
+        os.remove(filename + '.solving')
 
     # теперь их удаляет answer_submitter
     # os.remove(filename + '.solving')       

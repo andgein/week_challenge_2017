@@ -18,13 +18,20 @@ class Solver(TaskSolver):
         if 'ё' in value:
             return value.replace('ё', 'Ё')
 
-        result = None
         for word in self.collection:
             if value in word.lower():
                 Logger.debug('Found similar word "%s"' % word)
-                result = word
+                return self.set_accentuation(task.value, word)
+
+        return None
+
+    def set_accentuation(self, original, result):
+        for i, ch in enumerate(result):
+            if ch.isupper():
+                return original[:i] + original[i].upper() + original[i + 1:]
 
         return result
+                    
 
     @staticmethod
     def _replace_english_to_russian(text):
@@ -38,7 +45,7 @@ class Solver(TaskSolver):
 
     def tests(self):
         return [
-            ('oкружит', 'окружИт'),
+            ('oкружит', 'oкружИт'),
             ('заселён', 'заселЁн'),
             ('незадолго', 'незадОлго'),
         ]

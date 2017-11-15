@@ -49,7 +49,7 @@ class Solver(TaskSolver):
         for text in self.collection:
             if search_line in text:
                 Logger.info('Found search_line in text from collection')
-                return self.find_substitution(text, need_line)
+                return self.find_substitution(text, need_line).lower()
 
         return None
         
