@@ -47,7 +47,7 @@ def find_answer_and_submit_it(api):
 
     Logger.info('OK, it\'s task %s from solver %s' % (task_id, task_type))
 
-    api.submit_answer(task_id, answer, gracefully=True)
+    is_correct = api.submit_answer(task_id, answer, gracefully=True)
     os.remove(filename)
 
 
