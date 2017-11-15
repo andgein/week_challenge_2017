@@ -28,12 +28,16 @@ def main(task_type):
         Logger.error('Can\'t find solver for type %s' % task_type)
         return
 
-    while True:
+    solver.heavy_init()
+
+    while not stopped():
         try:
             find_task_and_solve_it(solver)
         except Exception as e:
             Logger.error('Exception: %s' % e)
         time.sleep(SLEEP_INTERVAL)
+
+    Logger.info('Exiting')
 
 
 def find_task_and_solve_it(solver):

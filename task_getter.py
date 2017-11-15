@@ -12,12 +12,16 @@ SLEEP_INTERVAL = 0.15 # in seconds
 TASKS_DIRECTORY = 'tasks'
 
 
+STOP_ON_UNKNOWN_TASKS = True
+SOLVERS = get_solvers()
+
+
 def main():
     if not os.path.exists(TASKS_DIRECTORY):
         os.makedirs(TASKS_DIRECTORY)
 
     api = Api(TOKEN)
-    while True:
+    while not stopped():
         try:
             task = api.get_task()
             Logger.info('Received new task: %s' % str(task))
@@ -32,12 +36,26 @@ def main():
             tf.write(json.dumps(task._asdict()))
             tf.close()
             Logger.info('Dumped task to %s and copying it to %s' % (tf.name, task_filename))
-    
+                
             shutil.copy(tf.name, task_filename)
+
+            if STOP_ON_UNKNOWN_TASKS and not is_task_known(task):
+                Logger.warn('Received unknown task: %s' % str(task))
+                sys.exit(1)
+
         except Exception as e:
             Logger.error('Exception occured: %s' % e)
         time.sleep(SLEEP_INTERVAL)
 
+    Logger.info('Exiting')
+
+
+def is_task_known(task):
+    for solver in solvers:
+        if solver.type_name == task.type:
+            return True
+
+    return False
 
 if __name__ == '__main__':
     Logger.setup(filename='logs/task_getter.log')

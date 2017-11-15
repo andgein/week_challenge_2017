@@ -1,3 +1,4 @@
 ﻿requests
 SpeechRecognition
 ffmpy
+python-telegram-bot

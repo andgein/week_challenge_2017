@@ -6,6 +6,10 @@ import time
 import threading
 import os
 import os.path
+import time
+
+
+TELEGRAM_TOKEN = '482407150:AAGSbEoKWnd15YhL5GyOubLjPBoFvAvVqLA'
 
 
 def get_solvers():
@@ -16,6 +20,7 @@ def get_solvers():
     import solvers.i_like_time
     import solvers.s_like_dollar
     import solvers.poems
+    import solvers.tsya
 
     return [
         solvers.colors.Solver(),
@@ -25,6 +30,7 @@ def get_solvers():
         solvers.i_like_time.Solver(),
         solvers.s_like_dollar.Solver(),
         solvers.poems.Solver(),
+        solvers.tsya.Solver(),
     ]
 
 
@@ -97,13 +103,13 @@ class JsonClient:
     def __init__(self, base_url=''):
         self.base_url = base_url
 
-    def get_or_die(self, url):
-        return self._make_request_or_die(url, lambda url: requests.get(url))
+    def get_or_die(self, url, tries=3):
+        return self._make_request_or_die(url, lambda url: requests.get(url), tries=tries)
 
-    def post_or_die(self, url, data=None):
+    def post_or_die(self, url, data=None, tries=3):
         if data is None:
             data = {}
-        return self._make_request_or_die(url, lambda url: requests.post(url, data=data))
+        return self._make_request_or_die(url, lambda url: requests.post(url, data=data), tries=tries)
     
     def _make_request_or_die(self, url, request_function, tries=3):
         for try_index in range(tries):
@@ -111,6 +117,7 @@ class JsonClient:
                 return self._try_make_request_or_die(url, request_function)
             except Exception as e:
                 Logger.debug('Exception: %s. Let\'s try one more time (%d/%d)' % (e, try_index + 1, tries))
+                time.sleep(0.2)
                 last_exception = e
         raise last_exception
         
@@ -121,6 +128,9 @@ class JsonClient:
         r = request_function(url)
         if not r.ok:
             Logger.warn('HTTP status code is %d' % (r.status_code))
+            # Костыль для отправки старых ответов
+            if r.status_code == 400:
+                return False    
             raise Exception('Can\'t get response from %s' % url);
 
         Logger.debug('HTTP status code is %d, response: "%s"' % (r.status_code, r.text))
@@ -138,7 +148,7 @@ class Api:
         task = self.client.get_or_die('/tasks?token=%s' % self.token)
         return Task(**task)
 
-    def submit_answer(self, task, answer):
+    def submit_answer(self, task, answer, gracefully=False):
         """
             task = api.get_task()
             is_correct = api.submit_answer(task, 'Your answer')
@@ -151,7 +161,13 @@ class Api:
             # task can be Task.id or Task itself
             task_id = task.id
         Logger.info('Try to submit answer "%s" for task %s' % (answer, task_id))
-        is_correct = self.client.post_or_die('/tasks?%s' % urlencode({'token': self.token, 'task': task_id, 'answer': answer}))
+        try:
+            is_correct = self.client.post_or_die('/tasks?%s' % urlencode({'token': self.token, 'task': task_id, 'answer': answer}), tries=15)
+        except:
+            if gracefully:
+                return False
+            else:
+                raise
         Logger.debug('Received response for answer submitting: %s' % is_correct) 
 
         if is_correct:
@@ -173,6 +189,9 @@ class TaskSolver:
 
     def solve(self, task):
         raise NotImplementedException('Each child should has its own .solve(task)')
+
+    def heavy_init(self):
+        pass
 
     def tests(self):
         return []
@@ -255,3 +274,5 @@ class MegaSolver:
         # Проигнорировали таск — как будто бы решили
         return True
         
+def stopped():
+    return os.path.exists('stop.txt')

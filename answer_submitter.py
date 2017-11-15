@@ -7,6 +7,7 @@ import json
 import glob
 import re
 import random
+import sys
 
 from weekchallenge import *
 
@@ -17,12 +18,14 @@ TASKS_DIRECTORY = 'tasks'
 
 def main():
     api = Api(TOKEN)
-    while True:
+    while not stopped():
         try:
             find_answer_and_submit_it(api)
         except Exception as e:
             Logger.error('Exception: %s' % e)
         time.sleep(SLEEP_INTERVAL)
+
+    Logger.info('Exiting')
 
 def find_answer_and_submit_it(api):
     files = glob.glob(os.path.join(TASKS_DIRECTORY, '*', '*.task.answer'))
@@ -41,7 +44,7 @@ def find_answer_and_submit_it(api):
     with open(filename, encoding='utf-8') as f:
         answer = f.read()
 
-    api.submit_answer(task_id, answer)
+    api.submit_answer(task_id, answer, gracefully=True)
     os.remove(filename)
 
 

@@ -19,7 +19,7 @@ class Solver(TaskSolver):
         # Степень
         text = text.replace('^', '**')
         # Двойные факториалы
-        text = re.sub(r'(\d+)!!', lambda m: '(' + '*'.join(map(str, range(1, int(m.group(1)) + 1, 2))) + ')', text)
+        text = re.sub(r'(\d+)!!', lambda m: '(' + '*'.join(map(str, range(1 if int(m.group(1)) % 2 == 1 else 2, int(m.group(1)) + 1, 2))) + ')', text)
         # Факториалы
         text = re.sub(r'(\d+)!', lambda m: '(' + '*'.join(map(str, range(1, int(m.group(1)) + 1))) + ')', text)
         # Производная

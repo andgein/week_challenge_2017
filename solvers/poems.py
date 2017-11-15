@@ -15,6 +15,9 @@ class Solver(TaskSolver):
     }
 
     def __init__(self):
+        pass
+
+    def heavy_init(self):
         files = glob.glob('files/poems/*')
         self.collection = []
         for filename in files:
