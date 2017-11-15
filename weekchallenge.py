@@ -7,9 +7,11 @@ import threading
 import os
 import os.path
 import time
+import telegram
 
 
 TELEGRAM_TOKEN = '482407150:AAGSbEoKWnd15YhL5GyOubLjPBoFvAvVqLA'
+TELEGRAM_CHAT_ID = '-1001270614477'
 
 
 def get_solvers():
@@ -273,6 +275,15 @@ class MegaSolver:
     
         # Проигнорировали таск — как будто бы решили
         return True
+
+
+class TelegramChat:
+    bot = telegram.Bot(TELEGRAM_TOKEN)
+
+    @classmethod
+    def send_message(cls, message):
+        cls.bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=message, parse_mode=telegram.ParseMode.MARKDOWN)
+
         
 def stopped():
     return os.path.exists('stop.txt')

@@ -13,4 +13,5 @@ start python solver_worker.py tts
 start python solver_worker.py tts
 start python solver_worker.py tsya
 
+start python send_score_to_telegram.py 
 start python answer_submitter.py
