@@ -282,6 +282,7 @@ class TelegramChat:
 
     @classmethod
     def send_message(cls, message):
+        Logger.debug('Sending message to our telegram chat: "%s"' % message)
         cls.bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=message, parse_mode=telegram.ParseMode.MARKDOWN)
 
         

@@ -69,6 +69,7 @@ def get_and_send_score(to_stdout=False):
 
 
 def get_scores():
+    Logger.info('Fetching scores from %s' % SCORE_URL)
     r = requests.get(SCORE_URL)
     if not r.ok:
         Logger.warn('HTTP status code is %d' % r.status_code)
@@ -86,4 +87,5 @@ def get_scores():
         yield (team_name, score)
 
 if __name__ == '__main__':
+    Logger.setup(filename='logs/send_score_to_telegram.log')
     main('--stdout' in sys.argv[1:])
