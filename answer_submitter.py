@@ -57,18 +57,21 @@ def find_answer_and_submit_it(api):
     os.remove(filename)
 
     if task_type not in temp_stats:
-        temp_stats[task_type] = {'s':0, 'f':0}
+        temp_stats[task_type] = {'s': 0, 'f': 0}
 
     temp_stats[task_type]['s' if is_correct else 'f'] += 1
     
-    global stats_sent_at
     if time.time() - stats_sent_at > STATS_SPAM_INTERVAL:
-        stats_sent_at = time.time()
-        Logger.info('sending stats to bot...')
-        try_send_stats()
+        try:
+            try_send_stats()
+        except Exception as e:
+            Logger.error('Exception: %s' % e)
 
 def try_send_stats():
     global temp_stats
+    global stats_sent_at
+
+    Logger.info('Sending statistics to our telegram chat')
 
     for task in temp_stats:
         if task not in stats:
@@ -83,14 +86,12 @@ def try_send_stats():
 
     task_infos = ('Таск: *{}* Успех: {}`(+{})`\tПровал: {}`(+{})`'
         .format(t, stats[t]['s'], temp_stats[t]['s'], stats[t]['f'], temp_stats[t]['f']) for t in stats)
-    msg = '\n'.join(task_infos)
+    msg = '*СТАТИСТИКА ПО ТАСКАМ*\n\n' + '\n'.join(task_infos)
+
+    TelegramChat.send_message(msg)
 
     temp_stats.clear()
-
-    try:
-        TelegramChat.send_message(msg)
-    except Exception as e:
-        Logger.error('send stats crashed. ' + e.message)
+    stats_sent_at = time.time()
 
 
 if __name__ == '__main__':
