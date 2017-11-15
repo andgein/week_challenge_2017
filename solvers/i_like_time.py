@@ -40,9 +40,12 @@ class Solver(TaskSolver):
         self.api = GoogleGeoApi()
 
     def solve(self, task):
-        splitted = task.value.split()
-        time = splitted[-3]
-        city_name = splitted[-2]
+        m = re.search(r'(\d{2}:\d{2}) (.+) \?', task.value)
+        if m is None:
+            Logger.error('Can\'t parse task: %s' % task.value)
+
+        time = m.groups()[0]
+        city_name = m.groups()[1]
 
         hours, minutes = self._parse_time(time)
         Logger.info('Current time is %d:%d' % (hours, minutes))

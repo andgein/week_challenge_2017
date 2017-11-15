@@ -45,7 +45,7 @@ class Solver(TaskSolver):
             Logger.info('"%s" found, but "%s" — no in our harry\'s content' % (other_form, need_word))
             return other_form
 
-        return name
+        return None
 
     def tests(self):
         return [

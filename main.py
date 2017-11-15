@@ -19,7 +19,8 @@ if __name__ == '__main__':
 
         for solver in SOLVERS:
             if module_name is not None and type(solver).__module__ != 'solvers.' + module_name:
-                continue                    
+                continue
+            solver.heavy_init()                
             solver.run_tests()
 
         print('OK! All tests done')

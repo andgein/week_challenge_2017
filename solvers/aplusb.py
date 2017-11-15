@@ -16,6 +16,8 @@ class Solver(TaskSolver):
 
     @staticmethod
     def _prepare(text):
+        if text == '0!':
+            text = '1'
         # Степень
         text = text.replace('^', '**')
         # Двойные факториалы

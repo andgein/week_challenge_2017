@@ -30,6 +30,8 @@ def main(task_type):
 
     solver.heavy_init()
 
+    rename_old_files(solver)
+
     while not stopped():
         try:
             find_task_and_solve_it(solver)
@@ -38,6 +40,14 @@ def main(task_type):
         time.sleep(SLEEP_INTERVAL)
 
     Logger.info('Exiting')
+
+
+def rename_old_files(solver):
+    files = glob.glob(os.path.join(TASKS_DIRECTORY, solver.type_name, '*.solving'))
+    for filename in files:
+        new_filename = filename[:-len('.solving')]
+        Logger.info('Recreate old solving file %s to %s' % (filename, new_filename))
+        shutil.move(filename, new_filename)
 
 
 def find_task_and_solve_it(solver):
@@ -55,10 +65,11 @@ def find_task_and_solve_it(solver):
         with open(filename + '.answer', 'w', encoding='utf-8') as f:
             f.write(answer)        
     else:
+        # TelegramChat.send_message('Солвер %s не смог решить задание "%s" (%s) и честно признался в этом 🤷🏼‍♀️' % (task.type, task.value, task.id))
         Logger.warn('Solver can\'t solve task %s, it returned None' % task.id)
 
-    os.remove(filename + '.solving')   
-    
+    # теперь их удаляет answer_submitter
+    # os.remove(filename + '.solving')       
 
 
 def find_task(folder):

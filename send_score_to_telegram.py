@@ -33,7 +33,7 @@ def get_and_send_score(to_stdout=False):
 
     scores = list(get_scores())
 
-    message = '*Текущие результаты*\n'
+    message = '*ТЕКУЩИЕ РЕЗУЛЬТАТЫ*\n'
     if len(last_scores) == 0:
         message += '_Я только запустился. Буду присылать изменения в результатах каждые %d минут_\n' % (SEND_SCORE_EACH // 60)
     message += '\n'

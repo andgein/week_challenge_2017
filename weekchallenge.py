@@ -89,10 +89,12 @@ class Logger:
             cls.instance.logger.warn(message)
 
     @classmethod
-    def error(cls, message):
+    def error(cls, message, dont_send_to_telegram=False):
         cls.init_if_needed()      
         if cls.enabled:
             cls.instance.logger.error(message)
+            # if not dont_send_to_telegram:
+            #     TelegramChat.send_message('*ОШИБКА*\n%s' % message)
 
     @classmethod
     def debug(cls, message):
@@ -283,7 +285,10 @@ class TelegramChat:
     @classmethod
     def send_message(cls, message):
         Logger.debug('Sending message to our telegram chat: "%s"' % message)
-        cls.bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=message, parse_mode=telegram.ParseMode.MARKDOWN)
+        try:
+            cls.bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=message, parse_mode=telegram.ParseMode.MARKDOWN)
+        except Exception as e:
+            Logger.error('Can\'t send message to our telegram chat: %s' % e, dont_send_to_telegram=True)
 
         
 def stopped():

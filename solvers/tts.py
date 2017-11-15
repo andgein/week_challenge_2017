@@ -56,8 +56,10 @@ class Solver(TaskSolver):
             Logger.info('Google Speech Recognition thinks you said "%s"' % recognized)
         except sr.UnknownValueError:
             Logger.error('Google Speech Recognition could not understand audio')
+            return None
         except sr.RequestError as e:
             Logger.error('Could not request results from Google Speech Recognition service; %s' % e)
+            return None
 
         quote = self._find_suitable_quote(recognized)
         if quote is None:

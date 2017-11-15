@@ -40,6 +40,9 @@ class Solver(TaskSolver):
             if '_' in line:
                 need_line = line
 
+        search_line = search_line.strip()
+        need_line = need_line.strip()
+
         Logger.info('Search line: "%s"' % search_line)
         Logger.info('Need line: "%s"' % need_line)
 
