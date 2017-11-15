@@ -35,14 +35,17 @@ def find_answer_and_submit_it(api):
 
     filename = random.choice(files)
     Logger.info('Found answer in %s' % filename)
-    m = re.match(r'.+[/\\]([^/\\]+)\.task\.answer', filename)
+    m = re.match(r'.+[/\\]([^/\\]+)[/\\]([^/\\]+)\.task\.answer', filename)
     if not m:
-        Logger.error('Can\'t get task id from filename %s' % filename)
+        Logger.error('Can\'t get task type and id from filename %s' % filename)
         return
 
-    task_id = m.groups(1)[0]
+    task_type = m.groups()[0]
+    task_id = m.groups()[1]
     with open(filename, encoding='utf-8') as f:
         answer = f.read()
+
+    Logger.info('OK, it\'s task %s from solver %s' % (task_id, task_type))
 
     api.submit_answer(task_id, answer, gracefully=True)
     os.remove(filename)
