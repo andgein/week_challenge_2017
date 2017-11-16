@@ -9,13 +9,20 @@ class Solver(TaskSolver):
     def solve(self, task):
         Logger.info('Calculating "%s"' % task.value)
         value = self._prepare(task.value)
-        Logger.info('I prepared expression. Calculating "%s" via eval' % value)
+        if answer is not None:
+            Logger.info('I prepared expression. Calculating "%s" via eval' % value)
+        else:
+            Logger.warn('Ha! I preverted injection! here is text: {}'.format(value))
+            return None
+
         answer = int(eval(value))
         Logger.info('Result is %d' % answer)
-        return str(answer)    
+        return str(answer)
 
     @staticmethod
     def _prepare(text):
+        if re.search('[a-zA-Z]', text):
+            return None
         if text == '0!':
             text = '1'
 
