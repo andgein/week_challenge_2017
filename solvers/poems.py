@@ -70,8 +70,14 @@ class Solver(TaskSolver):
         return None
         
     def find_substitution(self, text, need_line):
+        need_line = need_line.replace('(', r'\(')
+        need_line = need_line.replace(')', r'\)')
+        need_line = need_line.replace('+', r'\+')
+        need_line = need_line.replace('*', r'\*')
         re_value = re.sub(r'(_+)', r'(\1)', need_line)
         re_value = re_value.replace('_', '.')
+        re_value = re_value.replace('ё', 'е').replace('Ё', 'Е')
+        text = text.replace('ё', 'е').replace('Ё', 'Е')
         Logger.info('Use regexp: "%s"' % re_value)
         match = re.search(re_value, text, re.I)
         if match:

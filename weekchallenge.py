@@ -25,6 +25,7 @@ def get_solvers():
     import solvers.tsya
     import solvers.tsya_strikes_back
     import solvers.bruce_schneier
+    import solvers.image_word
 
     return [
         solvers.colors.Solver(),
@@ -37,6 +38,7 @@ def get_solvers():
         solvers.tsya.Solver(),
         solvers.tsya_strikes_back.Solver(),
         solvers.bruce_schneier.Solver(),
+        solvers.image_word.Solver(),
     ]
 
 
@@ -218,6 +220,8 @@ class MegaSolver:
     def __init__(self, token, *solvers):
         self.api = Api(token)
         self.solvers = solvers
+        for solver in self.solvers:
+            solver.heavy_init()
 
     def run(self, ask_after_each_task=True, ignore_unknown=False, ignore_wrong=False, ignore_when_solver_cant_solve=False, ignore_internal_errors=False):
         Logger.info('Run infinity loop for task solvers (ask_after_each_task=%s, ignore_unknown=%s)' % (ask_after_each_task, ignore_unknown))

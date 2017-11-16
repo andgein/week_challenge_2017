@@ -23,6 +23,7 @@ class Solver(TaskSolver):
     def _prepare(text):
         if re.search('[a-zA-Z]', text):
             return None
+
         if text == '0!':
             text = '1'
 

@@ -5,6 +5,7 @@ import requests
 from bs4 import BeautifulSoup
 import math
 import solvers.tools.pyecm as pyecm
+import solvers.tools.factmsieve as factmsieve
 
 
 class Solver(TaskSolver):
@@ -15,14 +16,19 @@ class Solver(TaskSolver):
     def solve(self, task):
         value = int(task.value)
 
+        factors = []
+
         for p in self.primes:
             while value % p == 0:
-                Logger.info('Divide to %d! %d %% %d = 0' % (p, value, p))
                 value //= p
+                factors.append(p)
 
-        # if len(str(value)) > 60:
-        #     Logger.warn('Number is too big :( [%d]' % value)
-        #     return None
+        if len(factors) > 0:
+            Logger.info('Divided and got factors: %s' % factors)
+
+        if len(str(value)) > 70:
+            Logger.warn('Number is too big :( [%d]' % value)
+            return None
 
         """
         r = requests.post(self.url, data={'number': str(value)})
@@ -39,20 +45,36 @@ class Solver(TaskSolver):
 
         Logger.info('Factorization is %s' % factorization)
         """
-        ov = 2 * math.log(math.log(value))
-        Logger.info('Try to factoring %d via ECM' % value)
-        factorization = list(pyecm.factors(value, False, False, ov, 1.0))
+        # ov = 2 * math.log(math.log(value))
+        # Logger.info('Try to factoring %d via ECM' % value)
+        # factorization = list(map(int, pyecm.factors(value, False, False, ov, 1.0)))
+
+        Logger.info('Try to factoring %d via MSIEVE' % value)
+        factorization = factmsieve.run(value)
+
+        if factorization is None:
+            return None
+
+        factorization = factors + factorization
 
         Logger.info('Factorization is %s' % factorization)
 
-        return str(max(factorization))
+        if len(factorization) == 2:
+            answer = str(max(factorization))
+        elif len(factorization) > 2 and min(factorization) == 2 and str(max(factorization)).endswith('9999'):
+            Logger.info('Try to send 2**k * minimum from large primes')
+            answer = str(value // max(factorization))            
+        else:
+            answer = None        
+
+        return answer
 
 
 
     def tests(self):
         return [
-            ('28947580231886369234390558330397320561852899208335943567121842176', '10888869450418352160768000001'),
-            ('10888869450418352160768000001', '10888869450418352160768000001'),
+            # ('28947580231886369234390558330397320561852899208335943567121842176', '10888869450418352160768000001'),
+            # ('10888869450418352160768000001', '10888869450418352160768000001'),
         ]
 
 

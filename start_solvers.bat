@@ -10,3 +10,7 @@ start python solver_worker.py tts
 start python solver_worker.py tts
 start python solver_worker.py tts
 start python solver_worker.py tsya
+start python solver_worker.py tsya-strikes-back
+start python solver_worker.py bruce-schneier
+start python solver_worker.py bruce-schneier
+start python solver_worder.py image-word

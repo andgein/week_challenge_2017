@@ -38,7 +38,7 @@ def main(to_stdout=False):
 def find_answer_and_submit_it(api, to_stdout=False):
     files = glob.glob(os.path.join(TASKS_DIRECTORY, '*', '*.task.answer'))
     if len(files) == 0:
-        Logger.info('No new answers found')
+        # Logger.info('No new answers found')
         return
 
     filename = random.choice(files)

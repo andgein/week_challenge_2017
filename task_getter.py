@@ -4,12 +4,13 @@ import os.path
 import tempfile
 import shutil
 import json
+import glob
 import sys
 
 from weekchallenge import *
 
 TOKEN = '745ba685-9cae-43ef-b1e6-2dbaf662b9c6'
-SLEEP_INTERVAL = 0.08 # in seconds
+SLEEP_INTERVAL = 0 # in seconds
 TASKS_DIRECTORY = 'tasks'
 
 
@@ -18,11 +19,18 @@ SOLVERS = get_solvers()
 
 
 def main():
+    sleep_schneier = False
+
     if not os.path.exists(TASKS_DIRECTORY):
         os.makedirs(TASKS_DIRECTORY)
 
     api = Api(TOKEN)
     while not stopped():
+        if sleep_schneier:
+            if len(glob.glob('tasks/bruce-schneier/*')) > 2:
+                time.sleep(SLEEP_INTERVAL)
+                continue
+
         try:
             task = api.get_task()
             Logger.info('Received new task: %s' % str(task))
@@ -44,6 +52,10 @@ def main():
                 Logger.warn('Received unknown task: %s' % str(task))
                 TelegramChat.send_message('*ALARM*\n\nПодъехал новый вид заданий: ```%s```Я пока остановил всех демонов до вашего прихода. Вперёд!\n_И да пребудет с вами сила._' % task.type)
                 sys.exit(1)
+
+            if task.type == 'bruce-schneier':
+                Logger.info('Sleep after bruce-schneier task')
+                sleep_schneier = True
 
         except Exception as e:
             Logger.error('Exception occured: %s' % e)

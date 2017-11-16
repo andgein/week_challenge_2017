@@ -1,4 +1,6 @@
 start python task_getter.py
+start python task_getter.py
+start python task_getter.py
 
 start start_solvers.bat
 

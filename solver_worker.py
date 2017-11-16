@@ -59,7 +59,12 @@ def find_task_and_solve_it(solver):
 
     Logger.info('Found task %s' % str(task))
 
-    answer = solver.solve(task)
+    try:
+        answer = solver.solve(task)
+    except Exception as e:
+        os.remove(filename + '.solving')
+        raise
+                
     if answer is not None:
         Logger.info('Solver returned answer "%s"' % answer)
         with open(filename + '.answer', 'w', encoding='utf-8') as f:
